@@ -9,6 +9,10 @@ public class Main {
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     };
 
+    private static final int ASCII_START = 32;
+    private static final int ASCII_END = 126;
+    private static final int ASCII_RANGE = ASCII_END - ASCII_START + 1;
+
     public static void displayMenu() {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("VIGENÈRE CIPHER - ENCRYPTION & DECRYPTION SYSTEM");
@@ -123,10 +127,62 @@ public class Main {
 
     public static String encryptAdvanced(String plaintext, String key) {
 
+        StringBuilder ciphertext = new StringBuilder();
+        int keyIndex = 0;
+
+        for (int i = 0; i < plaintext.length(); i++) {
+            char ch = plaintext.charAt(i);
+            int charCode = (int) ch;
+
+            if (charCode >= ASCII_START && charCode <= ASCII_END) {
+
+                char keyChar = key.charAt(keyIndex % key.length());
+                int keyCode = (int) keyChar;
+
+                int charPos = charCode - ASCII_START;
+                int keyPos = keyCode - ASCII_START;
+
+                // (P + K) mod range
+                int encryptedPos = (charPos + keyPos) % ASCII_RANGE;
+                char encryptedChar = (char) (encryptedPos + ASCII_START);
+
+                ciphertext.append(encryptedChar);
+                keyIndex++;
+            } else {
+                ciphertext.append(ch);
+            }
+        }
+
+        return ciphertext.toString();
     }
 
     public static String decryptAdvanced(String ciphertext, String key) {
+        StringBuilder plaintext = new StringBuilder();
+        int keyIndex = 0;
 
+        for (int i = 0; i < ciphertext.length(); i++) {
+            char ch = ciphertext.charAt(i);
+            int charCode = (int) ch;
+
+            if (charCode >= ASCII_START && charCode <= ASCII_END) {
+                char keyChar = key.charAt(keyIndex % key.length());
+                int keyCode = (int) keyChar;
+
+                int charPos = charCode - ASCII_START;
+                int keyPos = keyCode - ASCII_START;
+
+                // (C - K) mod range
+                int decryptedPos = (charPos - keyPos + ASCII_RANGE) % ASCII_RANGE;
+                char decryptedChar = (char) (decryptedPos + ASCII_START);
+
+                plaintext.append(decryptedChar);
+                keyIndex++;
+            } else {
+                plaintext.append(ch);
+            }
+        }
+
+        return plaintext.toString();
     }
 
     public static void main(String[] args) {
