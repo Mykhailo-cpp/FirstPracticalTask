@@ -42,16 +42,19 @@ public class Main {
             }
         }
 
+        if(mode.equals("advanced")) {
+            for (char c : key.toCharArray()) {
+                if (c < ASCII_START || c > ASCII_END) {
+                    return "Error: Key must contain only printable ASCII characters.";
+                }
+            }
+        }
+
         return null;
     }
 
     private static int getAlphabetPosition(char ch) {
-        for (int i = 0; i < ALPHABET.length; i++) {
-            if (ALPHABET[i] == ch) {
-                return i;
-            }
-        }
-        return -1;
+        return ch-'A';
     }
 
     public static String encryptBasic(String plaintext, String key) {
