@@ -4,6 +4,11 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static final char[] ALPHABET = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    };
+
     public static void displayMenu() {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("VIGENÈRE CIPHER - ENCRYPTION & DECRYPTION SYSTEM");
@@ -36,12 +41,84 @@ public class Main {
         return null;
     }
 
-    public static String encryptBasic(String plaintext, String key) {
+    private static int getAlphabetPosition(char ch) {
+        for (int i = 0; i < ALPHABET.length; i++) {
+            if (ALPHABET[i] == ch) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
+    public static String encryptBasic(String plaintext, String key) {
+        StringBuilder ciphertext = new StringBuilder();
+        String keyUpper = key.toUpperCase();
+        int keyIndex = 0;
+
+        for (int i = 0; i < plaintext.length(); i++) {
+            char ch = plaintext.charAt(i);
+
+            if (Character.isLetter(ch)) {
+
+                boolean isUpper = Character.isUpperCase(ch);
+                char charUpper = Character.toUpperCase(ch);
+
+                int charPos = getAlphabetPosition(charUpper);
+                char keyChar = keyUpper.charAt(keyIndex % keyUpper.length());
+                int keyPos = getAlphabetPosition(keyChar);
+
+                //(C + K) % 26
+                int encryptedPos = (charPos + keyPos) % ALPHABET.length;
+                char encryptedChar = ALPHABET[encryptedPos];
+
+                if (!isUpper) {
+                    encryptedChar = Character.toLowerCase(encryptedChar);
+                }
+
+                ciphertext.append(encryptedChar);
+                keyIndex++;
+            } else {
+                ciphertext.append(ch);
+            }
+        }
+
+        return ciphertext.toString();
     }
 
     public static String decryptBasic(String ciphertext, String key) {
+        StringBuilder plaintext = new StringBuilder();
+        String keyUpper = key.toUpperCase();
+        int keyIndex = 0;
 
+        for (int i = 0; i < ciphertext.length(); i++) {
+            char ch = ciphertext.charAt(i);
+
+            if (Character.isLetter(ch)) {
+
+                boolean isUpper = Character.isUpperCase(ch);
+                char charUpper = Character.toUpperCase(ch);
+
+
+                int charPos = getAlphabetPosition(charUpper);
+                char keyChar = keyUpper.charAt(keyIndex % keyUpper.length());
+                int keyPos = getAlphabetPosition(keyChar);
+
+                //(C - K + 26) mod 26
+                int decryptedPos = (charPos - keyPos + ALPHABET.length) % ALPHABET.length;
+                char decryptedChar = ALPHABET[decryptedPos];
+
+                if (!isUpper) {
+                    decryptedChar = Character.toLowerCase(decryptedChar);
+                }
+
+                plaintext.append(decryptedChar);
+                keyIndex++;
+            } else {
+                plaintext.append(ch);
+            }
+        }
+
+        return plaintext.toString();
     }
 
     public static String encryptAdvanced(String plaintext, String key) {
@@ -63,8 +140,13 @@ public class Main {
 
 
             if (!choice.matches("[1-5]")) {
-                System.out.println("\nInvalid choice. Please enter a number between 1 and 4.");
+                System.out.println("\nInvalid choice. Please enter a number between 1 and 5.");
                 continue;
+            }
+
+            if(choice.equals("5")) {
+                System.out.println("\nExiting...");
+                break;
             }
 
             String mode = (choice.equals("1") || choice.equals("2")) ? "basic" : "advanced";
@@ -113,16 +195,11 @@ public class Main {
                         System.out.println("Decryption Key: " + key);
                         System.out.println("Decrypted Text: " + result);
                         break;
-
-                    case "5":
-                        System.exit(0);
-                        break;
                 }
             } catch (Exception e) {
                 System.out.println("\nAn error occurred: " + e.getMessage());
                 System.out.println("Please try again.");
             }
         }
-        scanner.close();
     }
 }
